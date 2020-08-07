@@ -1,21 +1,27 @@
-# top-most EditorConfig file
 root = true
 
 [*]
-charset = utf-8
-end_of_line = lf
-insert_final_newline = true
 indent_style = space
-
-[*.{java,xml}]
 indent_size = 4
+ij_continuation_indent_size = 8
+end_of_line = lf
+charset = utf-8
 trim_trailing_whitespace = true
-indent_style = tab
-tab_width = 4
+insert_final_newline = true
 
-[{pom,wro}.xml]
-indent_size = 2
+[*.xml]
 indent_style = space
-
-[*.{html,sql,less}]
 indent_size = 2
+ij_continuation_indent_size = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[{*.svg,pom.xml,gradlew,gradlew.bat}]
+charset = unset
+end_of_line = unset
+insert_final_newline = unset
+trim_trailing_whitespace = unset
+indent_style = unset
+indent_size = unset
