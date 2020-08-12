@@ -1,0 +1,142 @@
+plugins {
+    id 'org.springframework.boot' version '2.4.8'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+    id 'pmd'
+    id 'checkstyle'
+    id 'com.github.spotbugs' version '4.7.1'
+    id 'net.ltgt.errorprone' version '2.0.1'
+    id 'org.ec4j.editorconfig' version '0.0.3'
+}
+
+group = 'org.springframework.samples'
+version = '2.4.8'
+sourceCompatibility = '11'
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://repo.spring.io/snapshot'
+    }
+    maven {
+        url 'https://repo.spring.io/milestone'
+    }
+}
+
+ext {
+    webjars = [
+        jquery     : [
+            version: '3.6.0',
+        ],
+        'jquery-ui': [
+            version: '1.12.1',
+        ],
+        bootstrap  : [
+            version: '3.4.1',
+        ]
+    ]
+
+    checkstyle = [
+        'spring-javaformat-checkstyle': [
+            version: '0.0.28',
+        ],
+        'tool': [
+            version: '8.32',
+        ],
+    ]
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-devtools'
+
+    implementation 'javax.cache:cache-api'
+    implementation 'org.ehcache:ehcache'
+    implementation 'org.webjars:webjars-locator-core'
+    implementation "org.webjars:jquery:${webjars.jquery.version}"
+    implementation "org.webjars:jquery-ui:${webjars.'jquery-ui'.version}"
+    implementation "org.webjars:bootstrap:${webjars.bootstrap.version}"
+
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'mysql:mysql-connector-java'
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testImplementation 'org.mockito:mockito-junit-jupiter'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+
+    checkstyle "io.spring.javaformat:spring-javaformat-checkstyle:${checkstyle.'spring-javaformat-checkstyle'.version}"
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// checkstyle
+checkstyle {
+    ignoreFailures = true
+    reportsDir = file("$buildDir/checkstyle")
+    configFile = file("$projectDir/gradle/checkstyle/spring-javaformat.xml")
+    toolVersion = checkstyle.tool.version
+}
+
+tasks.withType(Checkstyle) {
+    reports {
+        html.enabled = true
+        xml.enabled = false
+    }
+}
+
+// Spotbugs
+spotbugs {
+    ignoreFailures = true
+    reportsDir = file("$buildDir/spotbugs")
+    jvmArgs = [ '-Duser.language=ja' ]
+}
+
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
+    reports {
+        html.enabled = true
+        xml.enabled = false
+    }
+}
+
+// PMD
+pmd {
+    ignoreFailures = true
+    reportsDir = file("$buildDir/pmd")
+    ruleSets = [
+        'category/java/bestpractices.xml',
+        'category/java/codestyle.xml',
+        'category/java/design.xml',
+        'category/java/documentation.xml',
+        'category/java/errorprone.xml',
+        'category/java/multithreading.xml',
+        'category/java/performance.xml',
+        'category/java/security.xml',
+    ]
+}
+
+tasks.withType(Pmd) {
+    reports {
+        html.enabled = true
+        xml.enabled = false
+    }
+}
+
+// Error Prone
+// > Task :compileJava FAILED
+// エラー: プラグインが見つかりません: ErrorProne
+// tasks.withType(JavaCompile).configureEach {
+//     options.errorprone.disableWarningsInGeneratedCode = true
+// }
+
+// EditorConfig
+check.dependsOn editorconfigCheck
